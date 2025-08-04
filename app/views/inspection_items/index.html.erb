@@ -1,0 +1,41 @@
+<section>
+  <span class="block mb-2 font-semibold"> Your search of '<%= params[:part] %>' yielded <%= pluralize(@inspection_items.count, "result") %>: </span>
+
+  <section class="mb-4 grid grid-cols-2 gap-2">
+    <% @inspection_items.each do |inspection_item| %>
+      <%= link_to inspection_items_path(part: inspection_item.name), class: "cursor-pointer border-l-4 border border-yellow-300 bg-white" do %>
+        <div class="p-1"> <%= inspection_item.name %> </div>
+      <% end %>
+    <% end %>
+  </section>
+
+  <% if @inspection_items.count == 1 %>
+    <% inspection_item = @inspection_items.first %>
+
+    <% normal_checks = inspection_item.inspection_checks.normal %>
+    <% severe_checks = inspection_item.inspection_checks.severe %>
+    <% both_checks = inspection_item.inspection_checks.normal_and_severe %>
+
+    <section class="mb-4">
+      <div class="bg-white p-2">
+        <span class="text-lg font-semibold block mb-4"> <%= inspection_item.name %> </span>
+
+        <div class="mb-4">
+          <span class="font-semibold block mb-1"> For normal driving </span>
+          <% Array(normal_checks + both_checks).sort_by { |c| c.mileage_in_km }.each do |check| %>
+            <div> ⚙️  <%= check.to_s %> </div>
+          <% end %>
+        </div>
+
+        <div>
+          <span class="font-semibold block mb-1"> For severe driving </span>
+          <% Array(severe_checks + both_checks).sort_by { |c| c.mileage_in_km }.each do |check| %>
+            <div> ⚙️  <%= check.to_s %> </div>
+          <% end %>
+        </div>
+      </div>
+    </section>
+  <% end %>
+
+  <%= link_to "↩️", root_path, class: "block text-xl text-center bg-white cursor-pointer px-4 py-2 border border-gray-400" %>
+</section>

@@ -1,0 +1,53 @@
+<section>
+  <span class="block p-1 bg-black text-white text-2xl text-center mb-4"> 
+    <%= pluralize(number_to_currency(@mileage_in_km, unit: "", precision: 0), "km") %> 
+  </span>
+
+  <div class="bg-yellow-300 p-1 mb-4">
+    <span class="text-md"> 💡 To get a detailed maintenance schedule, click the corresponding part item. </span>
+  </div>
+
+  <div class="flex">
+    <%= link_to "normal driving", maintenance_check_path(@mileage_in_km, driving_condition: :normal), class: "text-lg px-2 py-1 border #{'bg-white text-black' if @condition == "normal"}" %>
+    <%= link_to "severe driving", maintenance_check_path(@mileage_in_km, driving_condition: :severe), class: "text-lg px-2 py-1 border #{'bg-white text-black' if @condition == "severe"}" %>
+  </div>
+
+  <section class="bg-white border shadow-md p-2 overflow-y-auto h-80 mb-4">
+    <% if @inspection_checks.empty? %>
+      <div class="text-center text-lg"> 
+        No checks found for <%= number_to_currency(@mileage_in_km, unit: "", precision: 0) %>kms. 
+      </div>
+    <% else %>
+      <span class="text-md italic block font-normal mb-2"> 
+        * 
+        <span class="font-semibold"><%= pluralize(@inspection_checks.replacement.size, "item") %> for replacement</span>, and 
+        <span class="font-semibold"><%= pluralize(@inspection_checks.inspection.size, "item") %> for inspection</span>.
+      </span>
+
+      <div class="grid grid-cols-1 gap-0">
+        <% @inspection_checks.each do |inspection_check| %>
+          <div class="flex items-center cursor-pointer"> 
+            <span class="block mr-2"> 
+              <% if inspection_check.inspection? %>
+                <span class="text-sm p-1 bg-gray-500 text-white"> inspect </span>
+              <% else %>
+                <span class="text-sm p-1 bg-red-600 text-white"> replace </span>
+              <% end %>
+            </span>
+
+            <%= link_to inspection_items_path(part: inspection_check.inspection_item.name) do %>
+              <div class="w-full hover:bg-yellow-300 hover:underline">
+                <span class="text-lg"> <%= inspection_check.inspection_item.name %> </span>
+                <% if inspection_check.notes.present? %>
+                  <span class="bg-yellow-300"> <%= inspection_check.notes.downcase %> </span>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </section>
+
+  <%= link_to "↩️", root_path, class: "block text-xl text-center bg-white cursor-pointer px-4 py-2 border border-gray-400" %>
+</section>
